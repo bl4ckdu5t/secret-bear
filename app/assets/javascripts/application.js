@@ -33,15 +33,46 @@ var ShortURL = new function() {
     return num;
   };
 };
+function fnSelect(objId) {
+	fnDeSelect();
+	if (document.selection) {
+	var range = document.body.createTextRange();
+	        range.moveToElementText(document.getElementById(objId));
+	range.select();
+	}
+	else if (window.getSelection) {
+	var range = document.createRange();
+	range.selectNode(document.getElementById(objId));
+	window.getSelection().addRange(range);
+	}
+}
+
+function fnDeSelect() {
+	if (document.selection) document.selection.empty(); 
+	else if (window.getSelection)
+              window.getSelection().removeAllRanges();
+}
 $(function(){
-	$('pre').focus(function(){
-		var $this = $(this);
-		$this.select();
-		$this.mouseup(function() {
-      // Prevent further mouseup intervention
-      $this.unbind("mouseup");
-      return false;
-    });
+	$('pre').click(function(){
+		fnSelect('code');
+	})
+	$('#queryForm').submit(function(e){
+		e.preventDefault();
+		var input = $('[type="url"]').val();
+		if(input){
+			$.ajax({
+				type: 'POST',
+				data: 'long='+input,
+				url: 'process'
+			}).done(function(response){
+				console.log(response.url);
+				$('#code').fadeIn(function(){
+					$(this).text(response.url)
+				});
+			}).fail(function(response){
+				console.log('failed');
+			});
+		}
 	});
-	console.log(ShortURL('1'));
+	//console.log(ShortURL.encode(1000000));
 });
