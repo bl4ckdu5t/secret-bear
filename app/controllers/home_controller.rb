@@ -14,6 +14,12 @@ class HomeController < ApplicationController
   	render json: { url: newLink.short }
   end
 
+  def display
+  	linkId = bijective_decode(params[:id]) / 24948484
+  	longURL = Link.find(linkId).long
+  	redirect_to longURL
+  end
+
   private
   ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split(//)
   def bijective_encode(i)
